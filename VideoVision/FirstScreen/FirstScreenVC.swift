@@ -15,10 +15,13 @@ class FirstScreenVC: UIViewController {
 	
 	private var viewModel: FirstScreenVM!
 	private var cancellables = Set<AnyCancellable>()
-	private var playerLayer: AVPlayerLayer?
 	
+	private var playerLayer: AVPlayerLayer?
+	private var cameraLayer: AVCaptureVideoPreviewLayer?
 	
 	private let videoContainerView = UIView()
+	private let cameraContainerView = UIView()
+	
 	private let playButton = UIButton()
 	private let timeSlider = UISlider()
 	private let timeLabel = UILabel()
@@ -41,16 +44,20 @@ class FirstScreenVC: UIViewController {
 		self.bindViewModel()
 		
 		self.viewModel.viewDidLoad()
-		
+		self.viewModel.startCamera()
 	}
 	
 	override func viewDidLayoutSubviews() {
-			super.viewDidLayoutSubviews()
-			
-			if let layer = self.playerLayer {
-				layer.frame = self.videoContainerView.bounds
-			}
+		super.viewDidLayoutSubviews()
+		
+		if let layer = self.playerLayer {
+			layer.frame = self.videoContainerView.bounds
 		}
+		
+		if let cLayer = self.cameraLayer {
+			cLayer.frame = self.cameraContainerView.bounds
+		}
+	}
 	
 	func bindViewModel() {
 		// VM의 데이터를 UI에 꽂아넣기 (Binding)
@@ -81,37 +88,54 @@ extension FirstScreenVC {
 	func setupUI() {
 		self.view.backgroundColor = .white
 		
-		
+		// 1. 비디오 레이어 가져오기
 		self.playerLayer = self.viewModel.getVideoLayer()
 		self.playerLayer?.videoGravity = .resizeAspectFill
-		
 		if let layer = self.playerLayer {
 			self.videoContainerView.layer.addSublayer(layer)
 		}
 		
-		let uiElements = [self.videoContainerView, self.playButton, self.timeSlider, self.timeLabel]
+		// 2. [추가] 카메라 레이어 가져오기
+		self.cameraLayer = self.viewModel.getCameraLayer()
+		self.cameraLayer?.videoGravity = .resizeAspectFill
+		if let layer = self.cameraLayer {
+			self.cameraContainerView.layer.addSublayer(layer)
+		}
+		
+		// 3. UI 추가
+		let uiElements = [
+			self.videoContainerView,
+			self.cameraContainerView, // [추가]
+			self.playButton,
+			self.timeSlider,
+			self.timeLabel
+		]
+		
 		uiElements.forEach {
 			$0.translatesAutoresizingMaskIntoConstraints = false
 			self.view.addSubview($0)
 		}
 		
+		// 4. 속성 설정
 		self.videoContainerView.backgroundColor = .black
+		self.cameraContainerView.backgroundColor = .darkGray // 로딩 전 색상
 		
 		self.playButton.backgroundColor = .systemBlue
 		self.playButton.setTitle("재생", for: .normal)
 		self.playButton.addTarget(self, action: #selector(self.tapPlayButton), for: .touchUpInside)
 		
-		//self.timeSlider.addTarget(self, action: #selector(self.sliderChanged), for: .valueChanged)
-		
 		self.timeLabel.textAlignment = .center
 		self.timeLabel.text = "0초 / 0초"
 		
+		// 5. 레이아웃 (Nintendo DS 스타일)
 		NSLayoutConstraint.activate([
+			// 상단: 비디오 (높이 300 고정)
 			self.videoContainerView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
 			self.videoContainerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
 			self.videoContainerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
 			self.videoContainerView.heightAnchor.constraint(equalToConstant: 300),
 			
+			// 중단: 컨트롤러
 			self.timeSlider.topAnchor.constraint(equalTo: self.videoContainerView.bottomAnchor, constant: 20),
 			self.timeSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
 			self.timeSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20),
@@ -119,9 +143,16 @@ extension FirstScreenVC {
 			self.timeLabel.topAnchor.constraint(equalTo: self.timeSlider.bottomAnchor, constant: 10),
 			self.timeLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
 			
-			self.playButton.topAnchor.constraint(equalTo: self.timeLabel.bottomAnchor, constant: 20),
+			self.playButton.topAnchor.constraint(equalTo: self.timeLabel.bottomAnchor, constant: 10),
 			self.playButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-			self.playButton.widthAnchor.constraint(equalToConstant: 100)
+			self.playButton.widthAnchor.constraint(equalToConstant: 100),
+			
+			// 하단: 카메라 (나머지 꽉 채우기) 🔥
+			self.cameraContainerView.topAnchor.constraint(equalTo: self.playButton.bottomAnchor, constant: 20),
+			self.cameraContainerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+			self.cameraContainerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+			self.cameraContainerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
 		])
 	}
+	
 }

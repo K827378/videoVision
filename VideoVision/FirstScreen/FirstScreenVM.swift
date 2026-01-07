@@ -77,7 +77,7 @@ final class FirstScreenVM {
 		self.cameraManager.startSession()
 	}
 	
-	func getCameraLayer() -> CALayer {
+	func getCameraLayer() -> AVCaptureVideoPreviewLayer {
 		return self.cameraManager.previewLayer
 	}
 }

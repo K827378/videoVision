@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>&quot;음향 녹음을 위한 마이크 접근권한 요청&quot;</string>
 	<key>NSCameraUsageDescription</key>
-	<string>&quot;방송 송출을 위한 카메라 접근권한 요청 &quot;</string>
+	<string>&quot;방송 송출을 위한 카메라 접근권한 요청&quot;</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
