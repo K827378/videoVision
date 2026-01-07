@@ -7,17 +7,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1B8174DF-48C1-438D-8FA0-BA83373789C2"
+            uuid = "E7AB3FF9-7D62-44AB-9446-DCD96FB73BD6"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "VideoVision/FirstScreen/FirstScreenVC.swift"
+            filePath = "VideoVision/Service/VideoPlayerManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
-            landmarkName = "FirstScreenVC"
-            landmarkType = "21">
+            startingLineNumber = "26"
+            endingLineNumber = "26"
+            landmarkName = "loadVideo(url:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

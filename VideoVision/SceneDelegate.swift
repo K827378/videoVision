@@ -10,7 +10,10 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
-
+	
+	func makeDIContainer() -> DIContainer {
+		return DIContainer()
+	}
 
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
@@ -18,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		window = UIWindow(windowScene: windowScene)
 		
-		let launchVC = FirstScreenVC()
+		let launchVC = makeDIContainer().makeFirstScreenVC()
 		window?.rootViewController = launchVC
 		window?.makeKeyAndVisible()
 		
