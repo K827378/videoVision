@@ -80,4 +80,8 @@ final class FirstScreenVM {
 	func getCameraLayer() -> AVCaptureVideoPreviewLayer {
 		return self.cameraManager.previewLayer
 	}
+	func didTapSwitchCameraButton() {
+		self.cameraManager.switchCamera()
+	}
+	
 }

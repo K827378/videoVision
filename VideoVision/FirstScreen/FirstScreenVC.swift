@@ -25,9 +25,7 @@ class FirstScreenVC: UIViewController {
 	private let playButton = UIButton()
 	private let timeSlider = UISlider()
 	private let timeLabel = UILabel()
-	
-	
-	
+	private let switchCameraButton = UIButton()
 	
 	class func create(with viewModel: FirstScreenVM) -> FirstScreenVC {
 		let vc = FirstScreenVC()
@@ -82,6 +80,14 @@ class FirstScreenVC: UIViewController {
 		self.viewModel.didTapPlayButton()
 	}
 	
+	@objc func tapSwitchCamera() {
+		// 버튼 눌렀을 때 햅틱(진동) 피드백 주면 더 리얼합니다.
+		let generator = UIImpactFeedbackGenerator(style: .medium)
+		generator.impactOccurred()
+		
+		// VM에게 요청
+		self.viewModel.didTapSwitchCameraButton()
+	}
 }
 
 extension FirstScreenVC {
@@ -127,6 +133,15 @@ extension FirstScreenVC {
 		self.timeLabel.textAlignment = .center
 		self.timeLabel.text = "0초 / 0초"
 		
+		let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold)
+		let image = UIImage(systemName: "arrow.triangle.2.circlepath.camera", withConfiguration: config)
+		self.switchCameraButton.setImage(image, for: .normal)
+		self.switchCameraButton.tintColor = .white // 잘 보이게 흰색
+		self.switchCameraButton.addTarget(self, action: #selector(self.tapSwitchCamera), for: .touchUpInside)
+		
+		self.view.addSubview(self.switchCameraButton)
+		self.switchCameraButton.translatesAutoresizingMaskIntoConstraints = false
+		
 		// 5. 레이아웃 (Nintendo DS 스타일)
 		NSLayoutConstraint.activate([
 			// 상단: 비디오 (높이 300 고정)
@@ -151,7 +166,12 @@ extension FirstScreenVC {
 			self.cameraContainerView.topAnchor.constraint(equalTo: self.playButton.bottomAnchor, constant: 20),
 			self.cameraContainerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
 			self.cameraContainerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-			self.cameraContainerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+			self.cameraContainerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+			
+			self.switchCameraButton.topAnchor.constraint(equalTo: self.cameraContainerView.topAnchor, constant: 20),
+			self.switchCameraButton.trailingAnchor.constraint(equalTo: self.cameraContainerView.trailingAnchor, constant: -20),
+			self.switchCameraButton.widthAnchor.constraint(equalToConstant: 44),
+			self.switchCameraButton.heightAnchor.constraint(equalToConstant: 44)
 		])
 	}
 	

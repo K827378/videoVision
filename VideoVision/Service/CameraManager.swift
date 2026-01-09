@@ -35,6 +35,7 @@ class CameraManager {
 	}
 	
 	private func setupCamera() {
+		// TODO: -  설정 관련한 객체 정도는 읽어볼것
 		self.captureSession.beginConfiguration()
 		
 		self.captureSession.sessionPreset = .high
@@ -59,14 +60,35 @@ class CameraManager {
 		
 		self.captureSession.commitConfiguration()
 		
+	}
+	
+	func switchCamera() {
+		// 세션 변경 시작
+		self.captureSession.beginConfiguration()
 		
-		// ... (아까 작성한 input 연결 로직) ...
-		// TODO: -  설정 관련한 객체 정도는 읽어볼것
-		//		guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-		//			  let input = try? AVCaptureDeviceInput(device: device) else { return }
-		//
-		//		if self.captureSession.canAddInput(input) {
-		//			self.captureSession.addInput(input)
-		//		}
+		// 1. 현재 비디오 입력 찾기
+		guard let currentInput = self.captureSession.inputs.first(where: { ($0 as? AVCaptureDeviceInput)?.device.hasMediaType(.video) ?? false }) as? AVCaptureDeviceInput else {
+			self.captureSession.commitConfiguration()
+			return
+		}
+		
+		// 2. 반대 방향 찾기
+		let newPosition: AVCaptureDevice.Position = (currentInput.device.position == .front) ? .back : .front
+		
+		guard let newDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition),
+			  let newInput = try? AVCaptureDeviceInput(device: newDevice) else {
+			self.captureSession.commitConfiguration()
+			return
+		}
+		
+		// 3. 갈아끼우기
+		self.captureSession.removeInput(currentInput)
+		if self.captureSession.canAddInput(newInput) {
+			self.captureSession.addInput(newInput)
+		} else {
+			self.captureSession.addInput(currentInput) // 실패 시 복구
+		}
+		
+		self.captureSession.commitConfiguration()
 	}
 }
