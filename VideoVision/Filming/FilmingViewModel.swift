@@ -9,7 +9,7 @@ import AVFoundation
 import Combine
 import Foundation
 
-final class FirstScreenVM {
+final class FilmingViewModel {
 	let cameraManager: CameraManager
 	let videoManager: VideoPlayerManager
 	
@@ -34,10 +34,9 @@ final class FirstScreenVM {
 		// 테스트용 URL (나중에는 외부에서 주입받을 수도 있음)
 		guard let url = URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") else { return }
 		
-		// 매니저에게 "이 URL 로드해!" 라고 시킴
+
 		self.videoManager.loadVideo(url: url)
 		
-		// [중요] 자동 재생을 원하면 여기서 바로 play() 호출
 		self.videoManager.play()
 	}
 	

@@ -11,12 +11,12 @@ final class DIContainer {
 	let cameraManager = CameraManager()
 	let videoPlayerManager = VideoPlayerManager()
 	
-	func makeFirstScreenVC() -> FirstScreenVC {
-		return FirstScreenVC.create(with: self.makeFirstScreenViewModel())
+	func makeFirstScreenVC() -> FilmingViewController {
+		return FilmingViewController.create(with: self.makeFirstScreenViewModel())
 	}
 	
-	func makeFirstScreenViewModel() -> FirstScreenVM {
-		return FirstScreenVM(
+	func makeFirstScreenViewModel() -> FilmingViewModel {
+		return FilmingViewModel(
 			cameraManager: cameraManager,
 			videoPlayerManager: videoPlayerManager
 		)

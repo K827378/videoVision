@@ -5,9 +5,14 @@
 //  Created by KimRin on 1/7/26.
 //
 
+/*
+ 카메라, 마이크 입력
+ 
+ */
+
 import AVFoundation
 
-class CameraManager {
+class CameraManager: NSObject {
 	private let captureSession = AVCaptureSession()
 	
 	lazy var previewLayer: AVCaptureVideoPreviewLayer = {
@@ -15,6 +20,12 @@ class CameraManager {
 		layer.videoGravity = .resizeAspectFill
 		return layer
 	}()
+	
+	// 데이터를 밖으로
+		private let videoOutput = AVCaptureVideoDataOutput()
+	// 영상 데이터 처리를 담당
+		// "com.video.output"은 그냥 이름표
+	private let videoOutputQueue = DispatchQueue(label: "com.video.output")
 	
 	func checkPermission() {
 		// TODO: - 권한 alert
@@ -52,10 +63,10 @@ class CameraManager {
 			
 			if self.captureSession.canAddInput(audioInput) {
 				self.captureSession.addInput(audioInput)
-				print("✅ 마이크 연결 성공")
+				print("mic connected")
 			}
 		} else {
-			print("⚠️ 마이크를 찾을 수 없습니다. (시뮬레이터인가요?)")
+			print("no mic?)")
 		}
 		
 		self.captureSession.commitConfiguration()
