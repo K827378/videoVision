@@ -86,4 +86,8 @@ extension FilmingViewModel {
 	func didTapSwitchCameraButton() {
 		self.cameraManager.switchCamera()
 	}
+	
+	func capturePhoto() {
+		
+	}
 }
