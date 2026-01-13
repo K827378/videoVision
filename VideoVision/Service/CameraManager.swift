@@ -5,26 +5,20 @@
 //  Created by KimRin on 1/7/26.
 //
 
-/*
- 카메라, 마이크 입력
- 
- */
 
 import AVFoundation
 
 class CameraManager: NSObject {
 	private let captureSession = AVCaptureSession()
-	
-	lazy var previewLayer: AVCaptureVideoPreviewLayer = {
-		let layer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-		layer.videoGravity = .resizeAspectFill
-		return layer
-	}()
+	// 외부(ViewModel -> VC)에서 접근할 수 있는 용도
+	var session: AVCaptureSession {
+		return self.captureSession
+	}
 	
 	// 데이터를 밖으로
-		private let videoOutput = AVCaptureVideoDataOutput()
+	private let videoOutput = AVCaptureVideoDataOutput()
 	// 영상 데이터 처리를 담당
-		// "com.video.output"은 그냥 이름표
+	// "com.video.output"은 그냥 이름표
 	private let videoOutputQueue = DispatchQueue(label: "com.video.output")
 	
 	func checkPermission() {
