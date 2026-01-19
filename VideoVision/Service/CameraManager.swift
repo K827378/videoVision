@@ -12,14 +12,18 @@ import AVFoundation
 class CameraManager: NSObject {
 	private let captureSession = AVCaptureSession()
 	
+	private var simulationTimer: Timer?
+	
 	var session: AVCaptureSession {
 		return self.captureSession
 	}
+	
 	//비디오 아웃풋
 	private let videoOutput = AVCaptureVideoDataOutput()
 	// 비디오 큐
 	private let videoOutputQueue = DispatchQueue(label: "com.video.output")
 	
+	// 앱 권한 확인
 	func checkPermission() {
 		switch AVCaptureDevice.authorizationStatus(for: .video) {
 		case .authorized:
@@ -41,15 +45,47 @@ class CameraManager: NSObject {
 	}
 	
 	func startSession() {
+#if targetEnvironment(simulator)
+		print("📱 Simulator Mode: Starting Mock Camera...")
+		self.startSimulation()
+#else
+		// 실기기일 때 기존 로직
 		self.setupCamera()
-		// 시작은 시간이 좀 걸리는 작업이라 백그라운드에서 돌리는 게 국룰이라고함  (UI 멈춤 방지)
 		DispatchQueue.global(qos: .background).async {
 			if !self.captureSession.isRunning {
 				self.captureSession.startRunning()
 			}
 		}
+#endif
 	}
 	
+	private func startSimulation() {
+		// 0.033초 (약 30FPS)마다 타이머 실행
+		self.simulationTimer = Timer.scheduledTimer(withTimeInterval: 0.033, repeats: true) { [weak self] _ in
+			guard let self = self else { return }
+			
+			// 1. 가짜 데이터 생성
+			guard let mockBuffer = MockDataGenerator.makeMockPixelBuffer() else { return }
+			
+			// 2. 중요!! 우리가 만든 'Serial Queue'로 작업을 보냄 (실제 카메라 동작 흉내)
+			self.videoOutputQueue.async {
+				// 3. 델리게이트 직접 호출 (CMSampleBuffer 대신 PixelBuffer를 바로 처리하도록 로직 수정 필요할 수 있음)
+				// 편의상 여기서 바로 처리 로직을 호출하거나, Mock용 Delegate 메서드를 만듭니다.
+				self.handleMockFrame(buffer: mockBuffer)
+			}
+		}
+	}
+	
+	
+	private func handleMockFrame(buffer: CVPixelBuffer) {
+		// 여기에 아까 작성한 처리 로직(Lock -> Print -> Unlock)을 넣으세요.
+		
+		CVPixelBufferLockBaseAddress(buffer, .readOnly)
+		let width = CVPixelBufferGetWidth(buffer)
+		let height = CVPixelBufferGetHeight(buffer)
+		print("🤖 Mock Frame: \(width)x\(height) | Thread: \(Thread.current)")
+		CVPixelBufferUnlockBaseAddress(buffer, .readOnly)
+	}
 	
 	func stopSession() {
 		self.captureSession.stopRunning()
@@ -85,13 +121,13 @@ class CameraManager: NSObject {
 			
 			// TODO: - 픽셀 포맷 설정 (iOS 화면 출력 및 처리에 가장 많이 쓰이는 BGRA 형식) 내용 서치
 			videoOutput.videoSettings = [
-				kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)
+				kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)
 			]
 			
 			// TODO: - 	델리게이트 연결 (데이터를 받을 대리자는 self, 처리는 videoOutputQueue에서) 찾아볼것
 			videoOutput.setSampleBufferDelegate(self, queue: videoOutputQueue)
 			
-
+			
 		}
 		if let connection = videoOutput.connection(with: .video) {
 			
@@ -106,7 +142,7 @@ class CameraManager: NSObject {
 					connection.videoOrientation = .portrait
 				}
 			}
-
+			
 		}
 		self.captureSession.commitConfiguration()
 	}
@@ -139,11 +175,11 @@ class CameraManager: NSObject {
 		// 화면 전환 시 오리엔테이션이나 미러링 이슈가 생길 수 있는데, 그건 추후 처리
 		self.captureSession.commitConfiguration()
 	}
-
-
-func setupSession() {
 	
-}
+	
+	func setupSession() {
+		
+	}
 	
 	
 }
